@@ -1,5 +1,4 @@
 # todo: grap topic changes
-package Irssi::Email::Notify;
 use strict;
 use vars qw($VERSION %IRSSI);
 
@@ -87,7 +86,5 @@ sub _send_email {
 
 Irssi::signal_add_last("message private", "priv_msg");
 Irssi::signal_add_last("print text", "hilight");
-
-1;
 
 #- end
