@@ -1,4 +1,3 @@
-# todo: grap topic changes
 use strict;
 use vars qw($VERSION %IRSSI);
 
@@ -18,14 +17,6 @@ $VERSION = '0.0.1';
   changed     => 'Fri Jun 13 17:04:49 EDT 2008'
 );
 
-# XXX eventually, fix this so it isn't global
-my %CONFIG = (
-  email_from  => 'irssi <xdg@echo.dagolden.com>',
-  email_to    => '9172923043@txt.att.net',
-);
-
-my $MAILER = Email::Send->new( );
-
 #--------------------------------------------------------------------
 # In parts based on fnotify.pl 0.0.3 by Thorsten Leemhuis 
 # http://www.leemhuis.info/files/fnotify/
@@ -38,23 +29,55 @@ my $MAILER = Email::Send->new( );
 # http://fedora.feedjack.org/user/918/
 #--------------------------------------------------------------------
 
+my $MAILER = Email::Send->new( );
+
+# Configuration handling
+my %CONFIG;
+
+sub load_config {
+  %CONFIG = (
+    email_from  => Irssi::settings_get_str('email_notify_from'), 
+    email_to    => Irssi::settings_get_str('email_notify_to'),
+    cooldown    => Irssi::settings_get_int('email_notify_cooldown'),
+  );
+  if ( ! $CONFIG{email_from} ) {
+    Irssi::print("$IRSSI{name} requires an 'email_notify_from' setting");
+  }
+  if ( ! $CONFIG{email_to} ) {
+    Irssi::print("$IRSSI{name} requires an 'email_notify_to' setting");
+  }
+  if ( $CONFIG{cooldown} < 0 ) {
+    $CONFIG{cooldown} = 120;
+    Irssi::print("$IRSSI{name} setting 'email_notify_cooldown' defaulting to 120");
+  }
+}
+
 #--------------------------------------------------------------------
 # Private message parsing
 #--------------------------------------------------------------------
 
+my %last_priv_from;
 sub priv_msg {
   my ($server,$msg,$nick,$address,$target) = @_;
-  _send_email(from => $nick, msg => $msg);
+  if ( time - ($last_priv_from{$nick} || 0 ) > $CONFIG{cooldown} ) {
+    $last_priv_from{$nick} = time;
+    _send_email(subject => $nick, msg => $msg);
+  }
 }
 
 #--------------------------------------------------------------------
 # Printing hilight's
 #--------------------------------------------------------------------
 
+my %last_hilight_from;
 sub hilight {
   my ($dest, $text, $stripped) = @_;
-  if ($dest->{level} & MSGLEVEL_HILIGHT) {
-    _send_email(channel => $dest->{target}, msg => $stripped);
+  my ($channel, $level) = ($dest->{target}, $dest->{level});
+  if ($level & MSGLEVEL_HILIGHT) {
+    if ( time - ($last_hilight_from{$channel} || 0 ) > $CONFIG{cooldown} ) {
+      $last_hilight_from{$channel} = time;
+      _send_email(subject => $channel, msg => $stripped);
+    }
   }
 }
 
@@ -64,27 +87,31 @@ sub hilight {
 
 sub _send_email {
   my (%args) = @_;
-  my $msg = $args{channel}
-          ? "In $args{channel}: '$args{msg}'"
-          : "$args{from} said: '$args{msg}'"
-          ;
+  my $subject = $args{subject};
+  my $msg = $args{msg};
 
   my $email = Email::Simple->create(
     header => [
       From    => $CONFIG{email_from},
       To      => $CONFIG{email_to},
-      Subject => substr($msg,0,40),
+      Subject => $subject,
     ],
-    body => length($msg) > 39 ? $msg : "",
-  ) or die "Couldn't create email message";
-  $MAILER->send($email) or die "Email couldn't be sent";
+    body => $msg,
+  ) or Irssi::print( "$IRSSI{name}: Couldn't create email '$subject'");
+  $MAILER->send($email) 
+    or Irssi::print( "$IRSSI{name}: Email '$subject' couldn't be sent" );
 }
 
 #--------------------------------------------------------------------
 # Irssi::signal_add_last / Irssi::command_bind
 #--------------------------------------------------------------------
 
+Irssi::settings_add_str($IRSSI{name}, 'email_notify_from', '');
+Irssi::settings_add_str($IRSSI{name}, 'email_notify_to', '');
+Irssi::settings_add_int($IRSSI{name}, 'email_notify_cooldown', -1);
+load_config();
 Irssi::signal_add_last("message private", "priv_msg");
 Irssi::signal_add_last("print text", "hilight");
+Irssi::signal_add_last("setup changed", "load_config")
 
 #- end
