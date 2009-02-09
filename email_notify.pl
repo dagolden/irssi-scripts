@@ -10,7 +10,7 @@ $VERSION = '0.0.2';
 %IRSSI = (
   authors     => 'David Golden',
   contact     => 'dagolden@cpan.org',
-  name        => 'email-notify.pl',
+  name        => 'email_notify',
   description => 'Send an email when someone is talking to you in some channel.',
   url         => 'http://echo.dagolden.com/git/?p=irssi-email-notify',
   license     => 'Apache License 2.0',
@@ -36,19 +36,19 @@ my %CONFIG;
 
 sub load_config {
   %CONFIG = (
-    email_from  => Irssi::settings_get_str('email_notify_from'), 
-    email_to    => Irssi::settings_get_str('email_notify_to'),
-    cooldown    => Irssi::settings_get_int('email_notify_cooldown'),
+    email_from  => Irssi::settings_get_str("$IRSSI{name}_from"), 
+    email_to    => Irssi::settings_get_str("$IRSSI{name}_to"),
+    cooldown    => Irssi::settings_get_int("$IRSSI{name}_cooldown"),
   );
   if ( ! $CONFIG{email_from} ) {
-    Irssi::print("$IRSSI{name} requires an 'email_notify_from' setting");
+    Irssi::print("$IRSSI{name} requires an '$IRSSI{name}_from' setting");
   }
   if ( ! $CONFIG{email_to} ) {
-    Irssi::print("$IRSSI{name} requires an 'email_notify_to' setting");
+    Irssi::print("$IRSSI{name} requires an '$IRSSI{name}_to' setting");
   }
   if ( $CONFIG{cooldown} < 0 ) {
     $CONFIG{cooldown} = 120;
-    Irssi::print("$IRSSI{name} setting 'email_notify_cooldown' defaulting to 120");
+    Irssi::print("$IRSSI{name} setting '$IRSSI{name}_cooldown' defaulting to 120");
   }
 }
 
@@ -106,9 +106,9 @@ sub _send_email {
 # Irssi::signal_add_last / Irssi::command_bind
 #--------------------------------------------------------------------
 
-Irssi::settings_add_str($IRSSI{name}, 'email_notify_from', '');
-Irssi::settings_add_str($IRSSI{name}, 'email_notify_to', '');
-Irssi::settings_add_int($IRSSI{name}, 'email_notify_cooldown', -1);
+Irssi::settings_add_str($IRSSI{name}, "$IRSSI{name}_from", '');
+Irssi::settings_add_str($IRSSI{name}, "$IRSSI{name}_to", '');
+Irssi::settings_add_int($IRSSI{name}, "$IRSSI{name}_cooldown", -1);
 load_config();
 Irssi::signal_add_last("message private", "priv_msg");
 Irssi::signal_add_last("print text", "hilight");
