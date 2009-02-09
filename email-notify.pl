@@ -6,7 +6,7 @@ use Email::Simple;
 use Email::Simple::Creator;
 use Email::Send;
 
-$VERSION = '0.0.1';
+$VERSION = '0.0.2';
 %IRSSI = (
   authors     => 'David Golden',
   contact     => 'dagolden@cpan.org',
@@ -14,7 +14,7 @@ $VERSION = '0.0.1';
   description => 'Send an email when someone is talking to you in some channel.',
   url         => 'http://echo.dagolden.com/git/?p=irssi-email-notify',
   license     => 'Apache License 2.0',
-  changed     => 'Fri Jun 13 17:04:49 EDT 2008'
+  changed     => 'Sun Feb  8 22:54:27 EST 2009'
 );
 
 #--------------------------------------------------------------------
