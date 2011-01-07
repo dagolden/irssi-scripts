@@ -4,7 +4,7 @@ use vars qw($VERSION %IRSSI);
 use Irssi;
 use Email::Simple;
 use Email::Simple::Creator;
-use Email::Send;
+use Email::Sender::Simple;
 
 $VERSION = '0.0.1';
 %IRSSI = (
@@ -28,8 +28,6 @@ $VERSION = '0.0.1';
 # Other parts based on notify.pl from Luke Macken
 # http://fedora.feedjack.org/user/918/
 #--------------------------------------------------------------------
-
-my $MAILER = Email::Send->new( );
 
 # Configuration handling
 my %CONFIG;
@@ -114,7 +112,7 @@ sub _send_email {
     ],
     body => $msg,
   ) or Irssi::print( "$IRSSI{name}: Couldn't create email '$subject'");
-  $MAILER->send($email) 
+  Email::Sender::Simple->try_to_send($email) 
     or Irssi::print( "$IRSSI{name}: Email '$subject' couldn't be sent" );
 }
 
