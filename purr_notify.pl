@@ -9,7 +9,7 @@ $VERSION = '0.0.1';
   contact     => 'dagolden@cpan.org',
   name        => 'purr_notify',
   description => 'Send a purr when someone is talking to you in some channel.',
-  url         => 'http://echo.dagolden.com/git/?p=irssi-purr-notify',
+  url         => 'https://github.com/dagolden/irssi-scripts/',
   license     => 'Apache License 2.0',
   changed     => 'Sun Feb 15 22:54:27 EST 2012'
 );
@@ -21,7 +21,6 @@ $VERSION = '0.0.1';
 # http://larve.net/people/hugo/2005/01/knotify.pl
 # which is based on osd.pl 0.3.3 by Jeroen Coekaerts, Koenraad Heijlen
 # http://www.irssi.org/scripts/scripts/osd.pl
-#
 # Other parts based on notify.pl from Luke Macken
 # http://fedora.feedjack.org/user/918/
 #--------------------------------------------------------------------

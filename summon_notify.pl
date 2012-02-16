@@ -12,7 +12,7 @@ $VERSION = '0.0.1';
   contact     => 'dagolden@cpan.org',
   name        => 'summon_notify',
   description => 'Send an email when someone is talking to you in some channel.',
-  url         => 'http://echo.dagolden.com/git/?p=irssi-email-notify',
+  url         => 'https://github.com/dagolden/irssi-scripts/',
   license     => 'Apache License 2.0',
   changed     => 'Sun Feb  8 22:54:27 EST 2009'
 );
